@@ -18,10 +18,6 @@ end
 
 function onTrigger(player, npc)
 
-	--player:messageSystem("Testing");
-	--player:PrintToPlayer("Testing");
-	--player:PrintToArea(".Testing", tpz.msg.channel.SHOUT, tpz.msg.area.SYSTEM, "Test123");
-
     local theDoorman = player:getQuestStatus(BASTOK, tpz.quest.id.bastok.THE_DOORMAN)
     local theTalekeeperTruth = player:getQuestStatus(BASTOK, tpz.quest.id.bastok.THE_TALEKEEPER_S_TRUTH)
 

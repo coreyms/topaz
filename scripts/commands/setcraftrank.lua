@@ -6,13 +6,13 @@ require("scripts/globals/status")
 
 cmdprops =
 {
-    permission = 3,
+    permission = 1,
     parameters = "sss"
 }
 
 function error(player, msg)
     player:PrintToPlayer(msg)
-    player:PrintToPlayer("!setcraftrank <craft skill or ID> <craft rank> {player}")
+    player:PrintToPlayer("!setcraftRank <craft skill or ID> <craft rank> {player}")
 end
 
 function onTrigger(player, craftName, tier, target)
