@@ -1,7 +1,7 @@
 ﻿/*
 ===========================================================================
 
-  Copyright (c) 2020 - Kreidos | github.com/kreidos
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,26 +19,27 @@
 ===========================================================================
 */
 
-#ifndef _CROESPARKPACKET_H
-#define _CROESPARKPACKET_H
+#include "../../common/socket.h"
 
-#include "../../common/cbasetypes.h"
+#include "message_debug.h"
 
-#include "basic.h"
+#include "../entities/baseentity.h"
 
-/************************************************************************
-*																		*
-*  																		*
-*																		*
-************************************************************************/
 
-class CCharEntity;
-
-class CRoeSparkUpdatePacket : public CBasicPacket
+CMessageDebugPacket::CMessageDebugPacket(CBaseEntity* PSender, CBaseEntity* PTarget, int32 param0, int32 param1, uint16 messageID)
 {
-public:
-    CRoeSparkUpdatePacket(CCharEntity* PChar);
-};
+	this->type = 0x2d;
+	this->size = 0x0e;
 
-#endif
+	ref<uint32>(0x04) = PSender->id;
+	ref<uint32>(0x08) = PTarget->id;
 
+	ref<uint16>(0x0C) = PSender->targid;
+	ref<uint16>(0x0E) = PTarget->targid;
+
+	ref<uint32>(0x10) = param0;
+	ref<uint32>(0x14) = param1;
+	ref<uint16>(0x18) = messageID;
+
+	//ref<uint8>(data,(0x1A)) = 0x01;
+}

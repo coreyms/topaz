@@ -47,7 +47,6 @@ along with this program.  If not, see http://www.gnu.org/licenses/
 #include "packet_system.h"
 #include "party.h"
 #include "utils/petutils.h"
-#include "utils/trustutils.h"
 #include "spell.h"
 #include "time_server.h"
 #include "transport.h"
@@ -55,7 +54,6 @@ along with this program.  If not, see http://www.gnu.org/licenses/
 #include "status_effect_container.h"
 #include "utils/zoneutils.h"
 #include "conquest_system.h"
-#include "daily_system.h"
 #include "utils/mobutils.h"
 #include "ai/controllers/automaton_controller.h"
 
@@ -223,9 +221,7 @@ int32 do_init(int32 argc, char** argv)
     battleutils::LoadMobSkillsList();
     battleutils::LoadSkillChainDamageModifiers();
     petutils::LoadPetList();
-    trustutils::LoadTrustList();
     mobutils::LoadCustomMods();
-    daily::LoadDailyItems();
 
     ShowStatus("do_init: loading zones");
     zoneutils::LoadZoneList();
@@ -273,7 +269,6 @@ void do_final(int code)
     battleutils::FreeMobSkillList();
 
     petutils::FreePetList();
-    trustutils::FreeTrustList();
     zoneutils::FreeZoneList();
     luautils::free();
     message::close();
@@ -972,30 +967,27 @@ int32 map_config_default()
     map_config.speed_mod = 0;
     map_config.mount_speed_mod = 0;
     map_config.mob_speed_mod = 0;
-    map_config.skillup_chance_multiplier = 1.0f;
-    map_config.craft_chance_multiplier = 1.0f;
+    map_config.skillup_chance_multiplier = 2.5f;
+    map_config.craft_chance_multiplier = 2.6f;
     map_config.skillup_amount_multiplier = 1;
     map_config.craft_amount_multiplier = 1;
-    map_config.craft_common_cap = 700;
-    map_config.craft_specialization_points = 400;
+    map_config.craft_day_matters = 1;
+    map_config.craft_moonphase_matters = 0;
+    map_config.craft_direction_matters = 0;
     map_config.mob_tp_multiplier = 1.0f;
     map_config.player_tp_multiplier = 1.0f;
     map_config.nm_hp_multiplier = 1.0f;
     map_config.mob_hp_multiplier = 1.0f;
     map_config.player_hp_multiplier = 1.0f;
-    map_config.alter_ego_hp_multiplier = 1.0f;
     map_config.nm_mp_multiplier = 1.0f;
     map_config.mob_mp_multiplier = 1.0f;
     map_config.player_mp_multiplier = 1.0f;
-    map_config.alter_ego_mp_multiplier = 1.0f;
     map_config.sj_mp_divisor = 2.0f;
     map_config.subjob_ratio = 1;
     map_config.include_mob_sj = false;
     map_config.nm_stat_multiplier = 1.0f;
     map_config.mob_stat_multiplier = 1.0f;
     map_config.player_stat_multiplier = 1.0f;
-    map_config.alter_ego_stat_multiplier = 1.0f;
-    map_config.alter_ego_skill_multiplier = 1.0f;
     map_config.ability_recast_multiplier = 1.0f;
     map_config.blood_pact_shared_timer = 0;
     map_config.vanadiel_time_epoch = 0;
@@ -1024,8 +1016,6 @@ int32 map_config_default()
     map_config.skillup_bloodpact = true;
     map_config.anticheat_enabled = false;
     map_config.anticheat_jail_disable = false;
-    map_config.daily_tally_amount = 10;
-    map_config.daily_tally_limit = 50000;
     return 0;
 }
 
@@ -1159,10 +1149,6 @@ int32 map_config_read(const int8* cfgName)
         {
             map_config.player_hp_multiplier = (float)atof(w2);
         }
-        else if (strcmp(w1, "alter_ego_hp_multiplier") == 0)
-        {
-            map_config.alter_ego_hp_multiplier = (float)atof(w2);
-        }
         else if (strcmp(w1, "nm_mp_multiplier") == 0)
         {
             map_config.nm_mp_multiplier = (float)atof(w2);
@@ -1174,10 +1160,6 @@ int32 map_config_read(const int8* cfgName)
         else if (strcmp(w1, "player_mp_multiplier") == 0)
         {
             map_config.player_mp_multiplier = (float)atof(w2);
-        }
-        else if (strcmp(w1, "alter_ego_mp_multiplier") == 0)
-        {
-            map_config.alter_ego_mp_multiplier = (float)atof(w2);
         }
         else if (strcmp(w1, "sj_mp_divisor") == 0)
         {
@@ -1202,14 +1184,6 @@ int32 map_config_read(const int8* cfgName)
         else if (strcmp(w1, "player_stat_multiplier") == 0)
         {
             map_config.player_stat_multiplier = (float)atof(w2);
-        }
-        else if (strcmp(w1, "alter_ego_stat_multiplier") == 0)
-        {
-            map_config.alter_ego_stat_multiplier = (float)atof(w2);
-        }
-        else if (strcmp(w1, "alter_ego_skill_multiplier") == 0)
-        {
-            map_config.alter_ego_skill_multiplier = (float)atof(w2);
         }
         else if (strcmp(w1, "ability_recast_multiplier") == 0)
         {
@@ -1283,13 +1257,17 @@ int32 map_config_read(const int8* cfgName)
         {
             map_config.craft_amount_multiplier = (float)atof(w2);
         }
-        else if (strcmp(w1, "craft_common_cap") == 0)
+        else if (strcmp(w1, "craft_day_matters") == 0)
         {
-            map_config.craft_common_cap = atoi(w2);
+            map_config.craft_day_matters = atof(w2);
         }
-        else if (strcmp(w1, "craft_specialization_points") == 0)
+        else if (strcmp(w1, "craft_moonphase_matters") == 0)
         {
-            map_config.craft_specialization_points = atoi(w2);
+            map_config.craft_moonphase_matters = atof(w2);
+        }
+        else if (strcmp(w1, "craft_direction_matters") == 0)
+        {
+            map_config.craft_direction_matters = atof(w2);
         }
         else if (strcmp(w1, "mysql_host") == 0)
         {
@@ -1394,14 +1372,6 @@ int32 map_config_read(const int8* cfgName)
         else if (strcmp(w1, "anticheat_jail_disable") == 0)
         {
             map_config.anticheat_jail_disable = atoi(w2);
-        }
-        else if (strcmp(w1, "daily_tally_amount") == 0)
-        {
-            map_config.daily_tally_amount = atoi(w2);
-        }
-        else if (strcmp(w1, "daily_tally_limit") == 0)
-        {
-            map_config.daily_tally_limit = atoi(w2);
         }
         else
         {

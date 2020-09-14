@@ -33,7 +33,6 @@ along with this program.  If not, see http://www.gnu.org/licenses/
 #include "entities/charentity.h"
 #include "entities/mobentity.h"
 #include "entities/npcentity.h"
-#include "entities/trustentity.h"
 
 #include "lua/luautils.h"
 
@@ -288,7 +287,6 @@ bool CBattlefield::InsertEntity(CBaseEntity* PEntity, bool enter, BATTLEFIELDMOB
             {
                 ApplyLevelRestrictions(PChar);
                 m_EnteredPlayers.emplace(PEntity->id);
-                PChar->ClearTrusts();
                 luautils::OnBattlefieldEnter(PChar, this);
             }
             else if (!IsRegistered(PChar))
@@ -390,9 +388,9 @@ CBaseEntity* CBattlefield::GetEntity(CBaseEntity* PEntity)
                     return PAlly;
         }
     }
-    else if (PEntity->objtype == TYPE_PET || PEntity->objtype == TYPE_TRUST)
+    else if (PEntity->objtype == TYPE_PET)
     {
-        if (auto POwner = dynamic_cast<CCharEntity*>(static_cast<CBattleEntity*>(PEntity)->PMaster))
+        if (auto POwner = dynamic_cast<CCharEntity*>(static_cast<CPetEntity*>(PEntity)->PMaster))
         {
             for (const auto id : m_EnteredPlayers)
                 if (id == POwner->id)
@@ -481,13 +479,13 @@ bool CBattlefield::RemoveEntity(CBaseEntity* PEntity, uint8 leavecode)
         }
         PEntity->loc.zone->PushPacket(PEntity, CHAR_INRANGE, new CEntityAnimationPacket(PEntity, CEntityAnimationPacket::Fade_Out));
     }
-
-    // Remove enmity from valid battle entities
-    if (auto PBattleEntity = dynamic_cast<CBattleEntity*>(PEntity))
+    // assume its either a player or ally and remove any enmity
+    if (PEntity->objtype != TYPE_NPC)
     {
-        PBattleEntity->StatusEffectContainer->DelStatusEffectsByFlag(EFFECTFLAG_CONFRONTATION, true);
-        PBattleEntity->StatusEffectContainer->DelStatusEffect(EFFECT_LEVEL_RESTRICTION);
-        ClearEnmityForEntity(PBattleEntity);
+        auto entity = static_cast<CBattleEntity*>(PEntity);
+        entity->StatusEffectContainer->DelStatusEffectsByFlag(EFFECTFLAG_CONFRONTATION, true);
+        entity->StatusEffectContainer->DelStatusEffect(EFFECT_LEVEL_RESTRICTION);
+        ClearEnmityForEntity(entity);
     }
 
     PEntity->PBattlefield = nullptr;

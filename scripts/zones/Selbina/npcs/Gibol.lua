@@ -6,6 +6,7 @@
 -----------------------------------
 local ID = require("scripts/zones/Selbina/IDs")
 require("scripts/globals/shop")
+require("scripts/globals/crafting")
 require("scripts/globals/settings")
 require("scripts/globals/status")
 -----------------------------------
@@ -14,9 +15,9 @@ function onTrade(player, npc, trade)
 end
 
 function onTrigger(player, npc)
-    local guildSkillId = tpz.skill.CLOTHCRAFT
-    local stock = tpz.shop.generalGuildStock[guildSkillId]
-    tpz.shop.generalGuild(player, stock, guildSkillId)
+    local guildRank = player:getSkillRank(tpz.skill.CLOTHCRAFT)
+    local stock = tpz.shop.generalGuildStock[guild.clothcraft]
+    tpz.shop.generalGuild(player, stock, guildRank)
     player:showText(npc, ID.text.CLOTHCRAFT_SHOP_DIALOG)
 end
 

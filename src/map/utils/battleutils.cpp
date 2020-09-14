@@ -56,7 +56,6 @@
 #include "../entities/battleentity.h"
 #include "../entities/mobentity.h"
 #include "../entities/petentity.h"
-#include "../entities/trustentity.h"
 #include "../enmity_container.h"
 #include "../items.h"
 #include "../item_container.h"
@@ -844,24 +843,24 @@ namespace battleutils
         Action->addEffectMessage = 0;
         Action->addEffectParam = 0;
 
-        EFFECT previous_daze = EFFECT_NONE;
-        uint16 previous_daze_power = 0;
+        EFFECT daze = EFFECT_NONE;
+        uint16 power = 0;
         if (PAttacker->StatusEffectContainer->HasStatusEffect(EFFECT_DRAIN_SAMBA))
         {
-            previous_daze = EFFECT_DRAIN_DAZE;
-            previous_daze_power = PAttacker->StatusEffectContainer->GetStatusEffect(EFFECT_DRAIN_SAMBA)->GetPower();
+            daze = EFFECT_DRAIN_DAZE;
+            power = PAttacker->StatusEffectContainer->GetStatusEffect(EFFECT_DRAIN_SAMBA)->GetPower();
         }
         else if (PAttacker->StatusEffectContainer->HasStatusEffect(EFFECT_ASPIR_SAMBA))
         {
-            previous_daze = EFFECT_ASPIR_DAZE;
-            previous_daze_power = PAttacker->StatusEffectContainer->GetStatusEffect(EFFECT_ASPIR_SAMBA)->GetPower();
+            daze = EFFECT_ASPIR_DAZE;
+            power = PAttacker->StatusEffectContainer->GetStatusEffect(EFFECT_ASPIR_SAMBA)->GetPower();
         }
         else if (PAttacker->StatusEffectContainer->HasStatusEffect(EFFECT_HASTE_SAMBA))
         {
-            previous_daze = EFFECT_HASTE_DAZE;
-            previous_daze_power = PAttacker->StatusEffectContainer->GetStatusEffect(EFFECT_HASTE_SAMBA)->GetPower();
+            daze = EFFECT_HASTE_DAZE;
+            power = PAttacker->StatusEffectContainer->GetStatusEffect(EFFECT_HASTE_SAMBA)->GetPower();
         }
-        if (previous_daze != EFFECT_NONE)
+        if (daze != EFFECT_NONE)
         {
             if (PAttacker->PParty != nullptr)
             {
@@ -878,10 +877,10 @@ namespace battleutils
                 PDefender->StatusEffectContainer->DelStatusEffect(EFFECT_HASTE_DAZE, PAttacker->id);
                 PDefender->StatusEffectContainer->DelStatusEffect(EFFECT_ASPIR_DAZE, PAttacker->id);
             }
-            if ((PDefender->m_EcoSystem != SYSTEM_UNDEAD) || (previous_daze == EFFECT_HASTE_DAZE))
+            if ((PDefender->m_EcoSystem != SYSTEM_UNDEAD) || (daze == EFFECT_HASTE_DAZE))
             {
-                PDefender->StatusEffectContainer->AddStatusEffect(new CStatusEffect(previous_daze,
-                    0, previous_daze_power,
+                PDefender->StatusEffectContainer->AddStatusEffect(new CStatusEffect(daze,
+                    0, power,
                     0, 10, PAttacker->id), true);
             }
         }
@@ -989,20 +988,17 @@ namespace battleutils
                 Action->addEffectMessage = 384;
             }
         }
-        else if (PDefender->StatusEffectContainer->HasStatusEffect(EFFECT_DRAIN_DAZE) ||
-            PDefender->StatusEffectContainer->HasStatusEffect(EFFECT_HASTE_DAZE) ||
-            PDefender->StatusEffectContainer->HasStatusEffect(EFFECT_ASPIR_DAZE))
+        else
         {
             // Generic drain for anyone able to do melee damage to a dazed target
             // TODO: ignore dazes from dancers outside party
             int16 delay = PAttacker->GetWeaponDelay(false) / 10;
 
-            if (PAttacker->PMaster == nullptr || PAttacker->objtype == TYPE_TRUST)
+            if (PAttacker->PMaster == nullptr)
             {
-                // TODO: All of this is very ugly, but is fairly fragile, be careful refactoring!
                 EFFECT daze = EFFECT_NONE;
                 uint16 power = 0;
-                if (PAttacker->objtype == TYPE_PC && PAttacker->PParty != nullptr)
+                if (PAttacker->PParty != nullptr && PAttacker->objtype == TYPE_PC)
                 {
                     for (uint8 i = 0; i < PAttacker->PParty->members.size(); i++)
                     {
@@ -1025,27 +1021,6 @@ namespace battleutils
                             break;
                         }
                     }
-                }
-                else if (PAttacker->objtype == TYPE_TRUST && PAttacker->PMaster)
-                {
-                    static_cast<CCharEntity*>(PAttacker->PMaster)->ForPartyWithTrusts([&](CBattleEntity* PMember)
-                    {
-                        if (daze == EFFECT_NONE && PDefender->StatusEffectContainer->HasStatusEffect(EFFECT_DRAIN_DAZE, PMember->id))
-                        {
-                            daze = EFFECT_DRAIN_DAZE;
-                            power = PDefender->StatusEffectContainer->GetStatusEffect(EFFECT_DRAIN_DAZE, PMember->id)->GetPower();
-                        }
-                        if (daze == EFFECT_NONE && PDefender->StatusEffectContainer->HasStatusEffect(EFFECT_DRAIN_DAZE, PMember->id))
-                        {
-                            daze = EFFECT_DRAIN_DAZE;
-                            power = PDefender->StatusEffectContainer->GetStatusEffect(EFFECT_DRAIN_DAZE, PMember->id)->GetPower();
-                        }
-                        if (daze == EFFECT_NONE && PDefender->StatusEffectContainer->HasStatusEffect(EFFECT_ASPIR_DAZE, PMember->id))
-                        {
-                            daze = EFFECT_DRAIN_DAZE;
-                            power = PDefender->StatusEffectContainer->GetStatusEffect(EFFECT_ASPIR_DAZE, PMember->id)->GetPower();
-                        }
-                    });
                 }
                 else
                 {
@@ -1134,6 +1109,71 @@ namespace battleutils
                 }
             }
         }
+
+        // TODO: move all this to scripts for each of these weapons
+
+        // elemental damage equation = (weapDmg / 2) +- (weapDmg / 4)
+
+        // no enspells active, check weapon additional effects
+
+        /*if (Action->animation == 1)
+            PWeapon = (CItemWeapon*)PChar->getStorage(LOC_INVENTORY)->GetItem(PChar->equip[SLOT_SUB]);
+        if(PWeapon != nullptr)
+        {
+            EFFECT dispelled;
+            switch(PWeapon->getID())
+            {
+                //Additional Effect: HP drain Weapons
+                case 16827:
+                case 16528:
+                case 16824:
+                case 17651:
+                case 16556:
+                case 16609:
+                case 16580:
+                case 17646:
+                case 16777:
+                case 16791:
+                case 16846:
+                case 16881:
+                case 17561:
+                case 17562:
+                case 17778:
+                case 17779:
+                case 17576:
+                case 17510:
+                    //30 % chance to drain, will heal 30% of damage done
+                    if (rand()%100 >= 30 || PWeapon==nullptr) return;
+
+                    Action->additionalEffect = SUBEFFECT_HP_DRAIN;
+                    Action->addEffectMessage = 161;
+                    Action->addEffectParam = (float)(Action->param * 0.3f);
+                    PAttacker->addHP(Action->addEffectParam);
+
+                    PChar->updatemask |= UPDATE_HP;
+                    return;
+
+
+                //Additional Effect: Dispel Weapons (10% chance needs verifying)
+                case 16942:
+                case 16944:
+                case 16950:
+                case 16951:
+                case 18330:
+                    if (rand()%100 > 10) return;
+                    dispelled = PDefender->StatusEffectContainer->DispelStatusEffect();
+                    // if(dispelled > 0){
+                    //     Action->submessageID = 42;
+                    //     Action->flag = 2;
+                    //     Action->subeffect = SUBEFFECT_LIGHT;
+                    //     Action->subparam = dispelled;
+                    // }
+                    return;
+                default:
+                    return;
+            }
+        }*/
+        return;
     }
 
     /************************************************************************
@@ -1474,12 +1514,7 @@ namespace battleutils
         return x;
     }
 
-    bool TryInterruptSpell(CBattleEntity* PAttacker, CBattleEntity* PDefender, CSpell* PSpell)
-    {
-        if (PDefender->objtype == TYPE_TRUST)
-        {
-            return false;
-        }
+    bool TryInterruptSpell(CBattleEntity* PAttacker, CBattleEntity* PDefender, CSpell* PSpell) {
 
         // cannot interrupt when manafont is active
         if (PDefender->StatusEffectContainer->HasStatusEffect(EFFECT_MANAFONT))
@@ -1490,6 +1525,7 @@ namespace battleutils
         // Songs cannot be interrupted by physical attacks.
         if ((SKILLTYPE)PSpell->getSkillType() == SKILL_SINGING)
         {
+            // ShowDebug("Is song, interrupt prevented.\n");
             return false;
         }
 
@@ -3029,32 +3065,6 @@ namespace battleutils
         return PDefender->getMod(defMod);
     }
 
-    std::vector<ELEMENT> GetSkillchainMagicElement(SKILLCHAIN_ELEMENT skillchain)
-    {
-        static const std::unordered_map<SKILLCHAIN_ELEMENT, std::vector<ELEMENT>> resonanceToElement = {
-            {SC_NONE, {}},
-            {SC_TRANSFIXION, {ELEMENT_LIGHT}},
-            {SC_COMPRESSION, {ELEMENT_DARK}},
-            {SC_LIQUEFACTION, {ELEMENT_FIRE}},
-            {SC_SCISSION, {ELEMENT_EARTH}},
-            {SC_REVERBERATION, {ELEMENT_WATER}},
-            {SC_DETONATION, {ELEMENT_WIND}},
-            {SC_INDURATION, {ELEMENT_ICE}},
-            {SC_IMPACTION, {ELEMENT_THUNDER}},
-
-            {SC_GRAVITATION, {ELEMENT_DARK, ELEMENT_EARTH}},
-            {SC_DISTORTION, {ELEMENT_WATER, ELEMENT_ICE}},
-            {SC_FUSION, {ELEMENT_LIGHT, ELEMENT_FIRE}},
-            {SC_FRAGMENTATION, {ELEMENT_WIND, ELEMENT_THUNDER}},
-
-            {SC_LIGHT, {ELEMENT_LIGHT, ELEMENT_FIRE, ELEMENT_WIND, ELEMENT_THUNDER}},
-            {SC_DARKNESS, {ELEMENT_DARK, ELEMENT_EARTH, ELEMENT_WATER, ELEMENT_ICE}},
-            {SC_LIGHT_II, {ELEMENT_LIGHT}},
-            {SC_DARKNESS_II, {ELEMENT_DARK}}};
-
-        return resonanceToElement.at(skillchain);
-    }
-
     int32 TakeSkillchainDamage(CBattleEntity* PAttacker, CBattleEntity* PDefender, int32 lastSkillDamage, CBattleEntity* taChar)
     {
         TPZ_DEBUG_BREAK_IF(PAttacker == nullptr);
@@ -3405,15 +3415,12 @@ namespace battleutils
     *                                                                       *
     ************************************************************************/
 
-    void GenerateCureEnmity(CBattleEntity* PSource, CBattleEntity* PTarget, int32 amount)
+    void GenerateCureEnmity(CCharEntity* PSource, CBattleEntity* PTarget, int32 amount)
     {
         TPZ_DEBUG_BREAK_IF(PSource == nullptr);
         TPZ_DEBUG_BREAK_IF(PTarget == nullptr);
 
-        auto PMasterSource = PSource->PMaster ? PSource->PMaster : PSource;
-        auto PMasterSourceChar = static_cast<CCharEntity*>(PMasterSource);
-
-        for (SpawnIDList_t::const_iterator it = PMasterSourceChar->SpawnMOBList.begin(); it != PMasterSourceChar->SpawnMOBList.end(); ++it)
+        for (SpawnIDList_t::const_iterator it = PSource->SpawnMOBList.begin(); it != PSource->SpawnMOBList.end(); ++it)
         {
             CMobEntity* PCurrentMob = static_cast<CMobEntity*>(it->second);
 
@@ -3908,9 +3915,6 @@ namespace battleutils
             {
                 petutils::DespawnPet(PVictim);
             }
-
-            static_cast<CCharEntity*>(PVictim)->ClearTrusts();
-
             PVictim->PAI->SetController(std::make_unique<CPlayerCharmController>(static_cast<CCharEntity*>(PVictim)));
 
             battleutils::RelinquishClaim(static_cast<CCharEntity*>(PVictim));
@@ -4117,10 +4121,6 @@ namespace battleutils
                                 return;
                             }
                             CBattleEntity* highestClaim = mob->PEnmityContainer->GetHighestEnmity();
-                            if (highestClaim->objtype == TYPE_TRUST)
-                            {
-                                highestClaim = static_cast<CTrustEntity*>(highestClaim)->PMaster;
-                            }
                             PAttacker->ForAlliance([&](CBattleEntity* PMember){
                                 if (!highestClaim || highestClaim == PMember || highestClaim == PMember->PPet)
                                 { // someone in your alliance is top of hate list, claim for your alliance

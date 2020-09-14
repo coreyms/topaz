@@ -114,7 +114,11 @@ bool CMobController::CheckDetection(CBattleEntity* PTarget)
         TapDeaggroTime();
     }
 
-    return PMob->CanDeaggro() && (m_Tick >= m_DeaggroTime + 25s);
+    if (m_Tick >= m_DeaggroTime + 25s)
+    {
+        return true;
+    }
+    return false;
 }
 
 void CMobController::TryLink()
@@ -474,11 +478,7 @@ void CMobController::CastSpell(SpellID spellid)
         {
             PCastTarget = PTarget;
         }
-
-        if (PCastTarget)
-        {
-            Cast(PCastTarget->targid, spellid);
-        }
+        Cast(PCastTarget->targid, spellid);
     }
 }
 
@@ -685,7 +685,7 @@ void CMobController::DoRoamTick(time_point tick)
     else if (PMob->m_OwnerID.id != 0 && !(PMob->m_roamFlags & ROAMFLAG_IGNORE))
     {
         // i'm claimed by someone and need hate towards this person
-        PTarget = (CBattleEntity*)PMob->GetEntity(PMob->m_OwnerID.targid, TYPE_PC | TYPE_MOB | TYPE_PET | TYPE_TRUST);
+        PTarget = (CBattleEntity*)PMob->GetEntity(PMob->m_OwnerID.targid, TYPE_PC | TYPE_MOB | TYPE_PET);
 
         PMob->PEnmityContainer->AddBaseEnmity(PTarget);
 

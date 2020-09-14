@@ -90,9 +90,8 @@ CPartyMemberUpdatePacket::CPartyMemberUpdatePacket(CTrustEntity* PTrust, uint8 M
     ref<uint8>(0x24) = PTrust->GetSJob();
     ref<uint8>(0x25) = PTrust->GetSLevel();
 
-    memcpy(data + (0x26), PTrust->packetName.c_str(), PTrust->packetName.size());
+    memcpy(data + (0x26), PTrust->GetName(), PTrust->name.size());
 }
-
 CPartyMemberUpdatePacket::CPartyMemberUpdatePacket(uint32 id, const int8* name, uint16 memberFlags, uint8 MemberNumber, uint16 ZoneID)
 {
 

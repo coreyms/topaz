@@ -6,6 +6,7 @@
 -----------------------------------
 local ID = require("scripts/zones/Windurst_Waters/IDs")
 require("scripts/globals/shop")
+require("scripts/globals/crafting")
 require("scripts/globals/settings")
 require("scripts/globals/status")
 -----------------------------------
@@ -14,9 +15,9 @@ function onTrade(player, npc, trade)
 end
 
 function onTrigger(player, npc)
-    local guildSkillId = tpz.skill.COOKING
-    local stock = tpz.shop.generalGuildStock[guildSkillId]
-    tpz.shop.generalGuild(player, stock, guildSkillId)
+    local guildRank = player:getSkillRank(tpz.skill.COOKING)
+    local stock = tpz.shop.generalGuildStock[guild.cooking]
+    tpz.shop.generalGuild(player, stock, guildRank)
     player:showText(npc, ID.text.CHOMOJINJAHL_SHOP_DIALOG)
 end
 

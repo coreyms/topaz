@@ -33,7 +33,6 @@ CREATE TABLE `chars` (
   `missions` blob,
   `assault` blob,
   `campaign` blob,
-  `eminence` blob,
   `quests` blob,
   `keyitems` blob,
   `set_blue_spells` blob,
@@ -49,7 +48,6 @@ CREATE TABLE `chars` (
   `isstylelocked` tinyint(1) NOT NULL DEFAULT '0',
   `nnameflags` int(10) UNSIGNED NOT NULL DEFAULT '0',
   `moghancement` smallint(4) unsigned NOT NULL DEFAULT '0',
-  `timecreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`charid`),
   FULLTEXT KEY `charname` (`charname`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

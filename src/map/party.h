@@ -87,8 +87,6 @@ public:
     void RefreshSync();
     void SetPartyNumber(uint8 number);
 
-    uint32 GetTimeLastMemberJoined();
-
     void PushPacket(uint32 senderID, uint16 ZoneID, CBasicPacket* packet);		// отправляем пакет всем членам группы, за исключением PPartyMember
     void PushEffectsPacket();
     void EffectsChanged();
@@ -116,8 +114,6 @@ private:
 	void RemovePartyLeader(CBattleEntity* PEntity);     // лидер покидает группу
     std::vector<partyInfo_t> GetPartyInfo();
     void RefreshFlags(std::vector<partyInfo_t>&);
-
-    time_point m_TimeLastMemberJoined;
 };
 
 #endif
