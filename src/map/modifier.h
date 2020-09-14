@@ -354,6 +354,9 @@ enum class Mod
     SHIELD_MASTERY_TP         = 485, // Shield mastery TP bonus when blocking with a shield
     SENTINEL_EFFECT           = 837, // Sentinel effect in percents
     SHIELD_DEF_BONUS          = 905, // Shield Defense Bonus
+    COVER_TO_MP               = 965, // Converts a successful cover's phsyical damage to MP
+    COVER_MAGIC_AND_RANGED    = 966, // Redirects ranged and single target magic attacks to the cover ability user
+    COVER_DURATION            = 967, // Increases Cover Duration
 
     // Dark Knight
     ARCANE_CIRCLE_DURATION    = 858, // Arcane Circle extended duration in seconds
@@ -430,6 +433,7 @@ enum class Mod
     HIGH_JUMP_ENMITY_REDUCTION = 363, // for gear that reduces more enmity from high jump
     FORCE_JUMP_CRIT           = 828, // Critical hit rate bonus for jump and high jump
     WYVERN_EFFECTIVE_BREATH   = 829, // Increases the threshold for triggering healing breath/offensive breath more inclined to pick elemental weakness
+    WYVERN_SUBJOB_TRAITS      = 972, // Adds subjob traits to wyvern on spawn
 
     // Summoner
     AVATAR_PERPETUATION       = 371, // stores base cost of current avatar
@@ -802,8 +806,9 @@ enum class Mod
 
     // The spares take care of finding the next ID to use so long as we don't forget to list IDs that have been freed up by refactoring.
     // 570 through 825 used by WS DMG mods these are not spares.
-    // SPARE = 965, // stuff
-    // SPARE = 966, // stuff
+    // SPARE = 973, // stuff
+    // SPARE = 974, // stuff
+    // SPARE = 975, // stuff
 };
 
 //temporary workaround for using enum class as unordered_map key until compilers support it

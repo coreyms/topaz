@@ -281,6 +281,7 @@ public:
     int32 setsLevel(lua_State*);            // sets the character's level
     int32 levelCap(lua_State*);             // genkai
     int32 levelRestriction(lua_State*);     // Establish/return current level restriction
+    int32 addJobTraits(lua_State*);         // Add job traits
 
     // Player Titles and Fame
     int32 getTitle(lua_State*);             // Gets character's title
@@ -439,6 +440,7 @@ public:
 
     int32 reloadParty(lua_State* L);
     int32 disableLevelSync(lua_State* L);
+    int32 isLevelSync(lua_State* L);
 
     int32 checkSoloPartyAlliance(lua_State*);        // Check if Player is in Party or Alliance 0=Solo 1=Party 2=Alliance
 

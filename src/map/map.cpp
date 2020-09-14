@@ -48,6 +48,7 @@ along with this program.  If not, see http://www.gnu.org/licenses/
 #include "party.h"
 #include "utils/petutils.h"
 #include "utils/trustutils.h"
+#include "roe.h"
 #include "spell.h"
 #include "time_server.h"
 #include "transport.h"
@@ -226,6 +227,7 @@ int32 do_init(int32 argc, char** argv)
     trustutils::LoadTrustList();
     mobutils::LoadCustomMods();
     daily::LoadDailyItems();
+    roeutils::init();
 
     ShowStatus("do_init: loading zones");
     zoneutils::LoadZoneList();
@@ -970,6 +972,7 @@ int32 map_config_default()
     map_config.disable_gear_scaling = 0;
     map_config.all_jobs_widescan = 1;
     map_config.speed_mod = 0;
+    map_config.mount_speed_mod = 0;
     map_config.mob_speed_mod = 0;
     map_config.skillup_chance_multiplier = 1.0f;
     map_config.craft_chance_multiplier = 1.0f;
@@ -1257,6 +1260,10 @@ int32 map_config_read(const int8* cfgName)
         else if (strcmp(w1, "speed_mod") == 0)
         {
             map_config.speed_mod = atoi(w2);
+        }
+        else if (strcmp(w1, "mount_speed_mod") == 0)
+        {
+            map_config.mount_speed_mod = atoi(w2);
         }
         else if (strcmp(w1, "mob_speed_mod") == 0)
         {
