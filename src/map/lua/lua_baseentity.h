@@ -39,7 +39,7 @@ public:
     CLuaBaseEntity(lua_State*);
     CLuaBaseEntity(CBaseEntity*);
 
-    CBaseEntity* GetBaseEntity()const
+    CBaseEntity* GetBaseEntity() const
     {
         return m_PBaseEntity;
     }
@@ -54,6 +54,7 @@ public:
     int32 messagePublic(lua_State*);        // Sends a public Basic Message
     int32 messageSpecial(lua_State*);       // Sends Special Message
     int32 messageSystem(lua_State*);        // Sends System Message
+    int32 messageCombat(lua_State* L);      // Sends Combat Message
 
     // Variables
     int32 getCharVar(lua_State*);           // Returns a character variable
@@ -245,6 +246,7 @@ public:
     int32 getCampaignAllegiance(lua_State*); // Gets Campaign Allegiance of Entity
     int32 setCampaignAllegiance(lua_State*); // Sets Campaign Allegiance of Entity
 
+    int32 isSeekingParty(lua_State* L);
     int32 getNewPlayer(lua_State* L);
     int32 setNewPlayer(lua_State* L);
     int32 getMentor(lua_State* L);
@@ -263,6 +265,7 @@ public:
     int32 speed(lua_State*);                // скорость передвижения сущности
 
     int32 getPlaytime(lua_State*);
+    int32 getTimeCreated(lua_State*);
 
     // Player Jobs and Levels
     int32 getMainJob(lua_State*);           // Returns Entity Main Job
@@ -311,6 +314,11 @@ public:
     int32 completeMission(lua_State*);      // Complete Mission
     int32 setMissionLogEx(lua_State*);      // Sets mission log extra data to correctly track progress in branching missions.
     int32 getMissionLogEx(lua_State*);      // Gets mission log extra data.
+
+    int32 setEminenceCompleted(lua_State *L);  // Sets the complete flag for a record of eminence
+    int32 getEminenceCompleted(lua_State *L);  // Gets the record completed flag
+    int32 setEminenceProgress(lua_State *L);   // Sets progress on a record of eminence
+    int32 getEminenceProgress(lua_State *L);   // gets progress on a record of eminence
 
     int32 addAssault(lua_State*);           // Add Mission
     int32 delAssault(lua_State*);           // Delete Mission from Mission Log
@@ -414,12 +422,13 @@ public:
 
     // Parties and Alliances
     int32 getParty(lua_State* L);
+    int32 getPartyWithTrusts(lua_State* L);
     int32 getPartySize(lua_State* L);               // Get the size of a party in an entity's alliance
     int32 hasPartyJob(lua_State*);
     int32 getPartyMember(lua_State* L);             // Get a character entity from another entity's party or alliance
     int32 getPartyLeader(lua_State* L);
     int32 getLeaderID(lua_State* L);              // Get the id of the alliance/party leader *falls back to player id if no party*
-
+    int32 getPartyLastMemberJoinedTime(lua_State* L);
     int32 forMembersInRange(lua_State* L);
 
     int32 addPartyEffect(lua_State*);               // Adds Effect to all party members
@@ -505,6 +514,7 @@ public:
     int32 updateEnmityFromCure(lua_State*);
     int32 resetEnmity(lua_State*);             //resets enmity to player for specificed mob
     int32 updateClaim(lua_State*);             // Adds Enmity to player for specified mob and claims
+    int32 hasEnmity(lua_State*);               // Checks if you have ANY enmity with ANY mob in the zone
 
     // Status Effects
     int32 addStatusEffect(lua_State*);         // Adds status effect to character
@@ -588,7 +598,14 @@ public:
     // Pets and Automations
     int32 spawnPet(lua_State*);              // Calls Pet
     int32 despawnPet(lua_State*);            // Despawns Pet
-    int32 spawnTrust(lua_State*);            // Spawns trust
+
+    int32 spawnTrust(lua_State*);
+    int32 clearTrusts(lua_State*);
+    int32 getTrustID(lua_State*);
+    int32 trustPartyMessage(lua_State*);
+    int32 addSimpleGambit(lua_State*);
+    int32 addFullGambit(lua_State*);
+    int32 setTPSkills(lua_State*);
 
     int32 isJugPet(lua_State*);              // If the entity has a pet, test if it is a jug pet.
     int32 hasValidJugPetItem(lua_State*);

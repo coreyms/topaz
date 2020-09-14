@@ -956,6 +956,7 @@ public:
     bool        hasMPCost(); // checks if spell costs mp to use
     bool        isHeal(); // is a heal spell
     bool        isCure(); // is a Cure spell
+    bool        isDebuff(); // is a debuff spell
     bool        isNa(); // is a -na spell
     bool        canHitShadow(); // check if spell ignores shadows
 

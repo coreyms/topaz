@@ -1,7 +1,7 @@
 ﻿/*
 ===========================================================================
 
-  Copyright (c) 2010-2015 Darkstar Dev Teams
+  Copyright (c) 2020 - Kreidos | github.com/kreidos
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 ===========================================================================
 */
 
-#ifndef _CMESSAGEDEBUGPACKET_H
-#define _CMESSAGEDEBUGPACKET_H
+#ifndef _CROEUPDATEPACKET_H
+#define _CROEUPDATEPACKET_H
 
 #include "../../common/cbasetypes.h"
 
@@ -32,13 +32,13 @@
 *																		*
 ************************************************************************/
 
-class CBaseEntity;
+class CCharEntity;
 
-class CMessageDebugPacket : public CBasicPacket
+class CRoeUpdatePacket : public CBasicPacket
 {
 public:
-
-	CMessageDebugPacket(CBaseEntity* PSender, CBaseEntity* PTarget, int32 param0, int32 param1, uint16 messageID);
+    CRoeUpdatePacket(CCharEntity* PChar);
 };
 
 #endif
+
