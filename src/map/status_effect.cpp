@@ -69,11 +69,6 @@ uint16 CStatusEffect::GetType()
     return m_Type;
 }
 
-uint8 CStatusEffect::GetSlot()
-{
-    return m_Slot;
-}
-
 uint16 CStatusEffect::GetIcon()
 {
 	return m_Icon;
@@ -140,11 +135,6 @@ void CStatusEffect::SetIcon(uint16 Icon)
 void CStatusEffect::SetType(uint16 Type)
 {
     m_Type = Type;
-}
-
-void CStatusEffect::SetSlot(uint8 Slot)
-{
-    m_Slot = Slot;
 }
 
 void CStatusEffect::SetPower(uint16 Power)

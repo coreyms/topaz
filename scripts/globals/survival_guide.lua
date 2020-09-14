@@ -1,5 +1,4 @@
 require("scripts/globals/settings")
-require("scripts/globals/teleports")
 require("scripts/globals/survival_guide_map")
 
 tpz = tpz or {}

@@ -10,7 +10,6 @@ on:
     branches:
       - release
       - canary
-      - 'feature/**'
 
 jobs:
   Linux_Build_32bit:

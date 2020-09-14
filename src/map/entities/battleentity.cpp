@@ -208,15 +208,13 @@ int32 CBattleEntity::GetMaxMP()
 
 /************************************************************************
 *                                                                       *
-*  Movement speed, taking into account modifiers                        *
-*  Note: retail speeds show as a float in the client,                   *
-*        yet in the packet it seems to be just one byte 0-255..         *
+*  Скорость перемещения с учетом модификаторов                          *
 *                                                                       *
 ************************************************************************/
 
 uint8 CBattleEntity::GetSpeed()
 {
-    return (isMounted() ? 40 + map_config.mount_speed_mod : std::clamp<uint16>(speed * (100 + getMod(Mod::MOVE)) / 100, std::numeric_limits<uint8>::min(), std::numeric_limits<uint8>::max()));
+    return (isMounted() ? 50 + map_config.speed_mod : std::clamp<uint16>(speed * (100 + getMod(Mod::MOVE)) / 100, std::numeric_limits<uint8>::min(), std::numeric_limits<uint8>::max()));
 }
 
 bool CBattleEntity::CanRest()
@@ -1240,8 +1238,6 @@ void CBattleEntity::OnCastFinished(CMagicState& state, action_t& action)
 {
     auto PSpell = state.GetSpell();
     auto PActionTarget = static_cast<CBattleEntity*>(state.GetTarget());
-    CBattleEntity* POriginalTarget = PActionTarget;
-    bool IsMagicCovered= false;
 
     luautils::OnSpellPrecast(this, PSpell);
 
@@ -1288,16 +1284,6 @@ void CBattleEntity::OnCastFinished(CMagicState& state, action_t& action)
     }
     else
     {
-        if (this->objtype == TYPE_MOB && PActionTarget->objtype == TYPE_PC)
-        {
-            CBattleEntity* PCoverAbilityUser = battleutils::GetCoverAbilityUser(PActionTarget, this);
-            IsMagicCovered = battleutils::IsMagicCovered((CCharEntity*) PCoverAbilityUser);
-
-            if (IsMagicCovered)
-            {
-                PActionTarget = PCoverAbilityUser;
-            }
-        }
         // only add target
         PAI->TargetFind->findSingleTarget(PActionTarget, flags);
     }
@@ -1389,14 +1375,7 @@ void CBattleEntity::OnCastFinished(CMagicState& state, action_t& action)
         }
         actionTarget.messageID = msg;
 
-        if (IsMagicCovered)
-        {
-            state.ApplyMagicCoverEnmity(POriginalTarget, PActionTarget, (CMobEntity*)this);
-        }
-        else
-        {
-            state.ApplyEnmity(PTarget, ce, ve);
-        }
+        state.ApplyEnmity(PTarget, ce, ve);
 
         if (PTarget->objtype == TYPE_MOB && msg != MSGBASIC_SHADOW_ABSORB) // If message isn't the shadow loss message, because I had to move this outside of the above check for it.
         {
@@ -1512,8 +1491,6 @@ bool CBattleEntity::OnAttack(CAttackState& state, action_t& action)
 
     list.ActionTargetID = PTarget->id;
 
-    CBattleEntity* POriginalTarget = PTarget;
-
     /////////////////////////////////////////////////////////////////////////
     //	Start of the attack loop.
     /////////////////////////////////////////////////////////////////////////
@@ -1525,12 +1502,6 @@ bool CBattleEntity::OnAttack(CAttackState& state, action_t& action)
 
         // Set the swing animation.
         actionTarget.animation = attack.GetAnimationID();
-
-        if (attack.CheckCover())
-        {
-            PTarget = attackRound.GetCoverAbilityUserEntity();
-            list.ActionTargetID = PTarget->id;
-        }
 
         if (PTarget->StatusEffectContainer->HasStatusEffect(EFFECT_PERFECT_DODGE, 0))
         {
@@ -1656,7 +1627,7 @@ bool CBattleEntity::OnAttack(CAttackState& state, action_t& action)
                     actionTarget.reaction = REACTION_BLOCK;
                 }
 
-                actionTarget.param = battleutils::TakePhysicalDamage(this, PTarget, attack.GetAttackType(), attack.GetDamage(), attack.IsBlocked(), attack.GetWeaponSlot(), 1, attackRound.GetTAEntity(), true, true, attack.IsCountered(), attack.IsCovered(), POriginalTarget);
+                actionTarget.param = battleutils::TakePhysicalDamage(this, PTarget, attack.GetAttackType(), attack.GetDamage(), attack.IsBlocked(), attack.GetWeaponSlot(), 1, attackRound.GetTAEntity(), true, true);
                 if (actionTarget.param < 0)
                 {
                     actionTarget.param = -(actionTarget.param);
