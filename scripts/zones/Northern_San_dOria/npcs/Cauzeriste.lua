@@ -6,6 +6,7 @@
 -----------------------------------
 local ID = require("scripts/zones/Northern_San_dOria/IDs")
 require("scripts/globals/shop")
+require("scripts/globals/crafting")
 require("scripts/globals/settings")
 require("scripts/globals/status")
 -----------------------------------
@@ -14,9 +15,9 @@ function onTrade(player, npc, trade)
 end
 
 function onTrigger(player, npc)
-    local guildSkillId = tpz.skill.WOODWORKING
-    local stock = tpz.shop.generalGuildStock[guildSkillId]
-    tpz.shop.generalGuild(player, stock, guildSkillId)
+    local guildRank = player:getSkillRank(tpz.skill.WOODWORKING)
+    local stock = tpz.shop.generalGuildStock[guild.woodworking]
+    tpz.shop.generalGuild(player, stock, guildRank)
     player:showText(npc, ID.text.CAUZERISTE_SHOP_DIALOG)
 end
 

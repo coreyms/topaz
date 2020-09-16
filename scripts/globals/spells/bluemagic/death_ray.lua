@@ -28,18 +28,17 @@ function onSpellCast(caster, target, spell)
     if (caster:hasStatusEffect(tpz.effect.AZURE_LORE)) then
         multi = multi + 2.0
     end
-    params.attackType = tpz.attackType.MAGICAL
-    params.damageType = tpz.damageType.DARK
-    params.multiplier = multi
-    params.tMultiplier = 1.0
-    params.duppercap = 51
-    params.str_wsc = 0.0
-    params.dex_wsc = 0.0
-    params.vit_wsc = 0.0
-    params.agi_wsc = 0.0
-    params.int_wsc = 0.2
-    params.mnd_wsc = 0.1
-    params.chr_wsc = 0.0
+        params.damageType = tpz.damageType.DARK
+        params.multiplier = multi
+        params.tMultiplier = 1.0
+        params.duppercap = 51
+        params.str_wsc = 0.0
+        params.dex_wsc = 0.0
+        params.vit_wsc = 0.0
+        params.agi_wsc = 0.0
+        params.int_wsc = 0.2
+        params.mnd_wsc = 0.1
+        params.chr_wsc = 0.0
     damage = BlueMagicalSpell(caster, target, spell, params, INT_BASED)
     damage = BlueFinalAdjustments(caster, target, spell, damage, params)
 

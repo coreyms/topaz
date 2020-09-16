@@ -10,11 +10,15 @@ require("scripts/globals/status")
 ---------------------------------------------
 
 function onMobSkillCheck(target, mob, skill)
-    return 0
+    return 1
 end
 
 function onMobWeaponSkill(target, mob, skill)
+
     local typeEffect = tpz.effect.ENAERO
+
     skill:setMsg(MobBuffMove(mob, typeEffect, 65, 0, 60))
+
     return typeEffect
+
 end

@@ -69,21 +69,21 @@ function onTrigger(player, target, rank)
 		targ:addMission(pNation, 12)
 		targ:completeMission(pNation, 12)
 		if(pNation == 2) then -- windy
-			targ:addKeyItem(36) -- starway stairway bauble
-			targ:addKeyItem(195) -- portal charm
+			targ:addKeyItem(tpz.ki.STARWAY_STAIRWAY_BAUBLE) -- starway stairway bauble
+			targ:addKeyItem(tpz.ki.PORTAL_CHARM) -- portal charm
 		end
 	end
 	if(rank >= 5) then
 		targ:addMission(pNation, 13)
 		targ:completeMission(pNation, 13)
-		targ:addKeyItem(8) -- airship pass
+		targ:addKeyItem(tpz.ki.AIRSHIP_PASS) -- airship pass
 	end
 	if(rank >= 6) then
 		targ:addMission(pNation, 14)
 		targ:completeMission(pNation, 14)
 		targ:addMission(pNation, 15)
 		targ:completeMission(pNation, 15)
-		targ:addKeyItem(492) -- vial of shrouded sand (dynamis access)
+		targ:addKeyItem(tpz.ki.VIAL_OF_SHROUDED_SAND) -- vial of shrouded sand (dynamis access)
 		targ:addMission(3, 0) -- add zilart start mission
 	end
 	if(rank >= 7) then

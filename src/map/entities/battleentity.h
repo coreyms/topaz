@@ -580,7 +580,6 @@ public:
             func(this, std::forward<Args>(args)...);
         }
     }
-
     template        <typename F, typename... Args>
     void            ForAlliance(F func, Args&&... args)
     {
@@ -670,7 +669,9 @@ public:
     CBattleEntity*	PLastAttacker;
 
     std::unique_ptr<CStatusEffectContainer> StatusEffectContainer;
-    std::unique_ptr<CRecastContainer> PRecastContainer;
+    std::unique_ptr<CRecastContainer> PRecastContainer;         //
+
+
 
 private:
 

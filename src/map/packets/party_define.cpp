@@ -25,13 +25,12 @@ along with this program.  If not, see http://www.gnu.org/licenses/
 
 #include "../entities/charentity.h"
 #include "../entities/trustentity.h"
+#include "../party.h"
+#include "../alliance.h"
 #include "../utils/zoneutils.h"
 
-const char* msg = "SELECT chars.charid, partyflag, pos_zone, pos_prevzone FROM accounts_parties \
-                                        LEFT JOIN chars ON accounts_parties.charid = chars.charid WHERE \
-                                        IF (allianceid <> 0, allianceid = %d, partyid = %d) ORDER BY partyflag & %u, timestamp;";
 
-CPartyDefinePacket::CPartyDefinePacket(CParty* PParty, bool loadTrust)
+CPartyDefinePacket::CPartyDefinePacket(CParty* PParty)
 {
     this->type = 0xC8;
     this->size = 0x7C;
@@ -46,8 +45,10 @@ CPartyDefinePacket::CPartyDefinePacket(CParty* PParty, bool loadTrust)
 
         uint8 i = 0;
 
-        int ret = Sql_Query(SqlHandle, msg, allianceid, PParty->GetPartyID(), PARTY_SECOND | PARTY_THIRD);
-
+        int ret = Sql_Query(SqlHandle, "SELECT chars.charid, partyflag, pos_zone, pos_prevzone FROM accounts_parties \
+									   	LEFT JOIN chars ON accounts_parties.charid = chars.charid WHERE \
+										IF (allianceid <> 0, allianceid = %d, partyid = %d) ORDER BY partyflag & %u, timestamp;",
+            allianceid, PParty->GetPartyID(), PARTY_SECOND | PARTY_THIRD);
         if (ret != SQL_ERROR && Sql_NumRows(SqlHandle) > 0)
         {
             while (Sql_NextRow(SqlHandle) == SQL_SUCCESS)
@@ -63,20 +64,16 @@ CPartyDefinePacket::CPartyDefinePacket(CParty* PParty, bool loadTrust)
             }
         }
 
-        if (loadTrust)
+        if (PParty->GetLeader() != nullptr && PParty->GetLeader()->objtype == TYPE_PC)
         {
             CCharEntity* PLeader = (CCharEntity*)PParty->GetLeader();
-
-            if (PLeader != nullptr)
+            for (auto PTrust : PLeader->PTrusts)
             {
-                for (auto PTrust : PLeader->PTrusts)
-                {
-                    ref<uint32>(12 * i + (0x08)) = PTrust->id;
-                    ref<uint16>(12 * i + (0x0C)) = PTrust->targid;
-                    ref<uint16>(12 * i + (0x0E)) = 0;
-                    ref<uint16>(12 * i + (0x10)) = PTrust->getZone();
-                    i++;
-                }
+                ref<uint32>(12 * i + (0x08)) = PTrust->id;
+                ref<uint16>(12 * i + (0x0C)) = PTrust->targid;
+                ref<uint16>(12 * i + (0x0E)) = 0;
+                ref<uint16>(12 * i + (0x10)) = PTrust->getZone();
+                i++;
             }
         }
     }

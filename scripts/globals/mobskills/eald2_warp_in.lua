@@ -9,11 +9,11 @@ require("scripts/globals/msg")
 ---------------------------------------------
 
 function onMobSkillCheck(target, mob, skill)
-    return 0
+    return 1
 end
 
 function onMobWeaponSkill(target, mob, skill)
-    mob:useMobAbility(mob:getMobMod(tpz.mobMod.TELEPORT_END))
+    mob:useMobAbility(989)
     skill:setMsg(tpz.msg.basic.NONE)
     return 0
 end
