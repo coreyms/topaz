@@ -19,12 +19,12 @@ require("scripts/globals/common")
 ENABLE_COP     = 1
 ENABLE_TOAU    = 1
 ENABLE_WOTG    = 1
-ENABLE_ACP     = 1
-ENABLE_AMK     = 1
-ENABLE_ASA     = 1
-ENABLE_ABYSSEA = 1
-ENABLE_SOA     = 1
-ENABLE_ROV     = 1
+ENABLE_ACP     = 0
+ENABLE_AMK     = 0
+ENABLE_ASA     = 0
+ENABLE_ABYSSEA = 0
+ENABLE_SOA     = 0
+ENABLE_ROV     = 0
 ENABLE_VOIDWATCH = 1 -- Not an expansion, but has its own storyline.
 
 -- FIELDS OF VALOR/Grounds of Valor settings
