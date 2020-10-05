@@ -18,6 +18,37 @@ require("scripts/globals/titles")
 -----------------------------------
 
 function onTrade(player, npc, trade)
+	if (trade:hasItemQty(2556, 1) == true and trade:getItemCount() == 1) then
+		if(player:getCharVar("maatDefeated") ~= 1) then
+			if(player:getMainJob() == tpz.job.DNC and player:getMainLvl() > 65) then
+				if(player:hasItem(16138) and player:hasItem(14578) and player:hasItem(15002) and player:hasItem(15659) and player:hasItem(15746)) then
+					if(player:levelCap() < 75) then
+						player:levelCap(75)
+					end
+					player:setCharVar("maatDefeated", 1)
+					player:PrintToPlayer("Your level cap has been increased to 75! Congratulations!")
+					player:tradeComplete()
+				else
+					if(player:hasItem(16139) and player:hasItem(14579) and player:hasItem(15003) and player:hasItem(15660) and player:hasItem(15747)) then
+						if(player:levelCap() < 75) then
+							player:levelCap(75)
+						end
+						player:setCharVar("maatDefeated", 1)
+						player:PrintToPlayer("Your level cap has been increased to 75! Congratulations!")
+						player:tradeComplete()
+					else
+						player:PrintToPlayer("Please return to me once you own your AF gear")
+					end
+				end
+			else
+				player:PrintToPlayer("Please return to me when you are a Dancer 66 or higher")
+			end
+		else
+			player:PrintToPlayer("Your level cap is already 75.")
+		end
+	else
+		player:PrintToPlayer("You must trade me a Dancer's Testimony.")
+	end
 end
 
 function onTrigger(player, npc)
@@ -79,6 +110,10 @@ function onTrigger(player, npc)
     else
         player:startEvent(10120) -- Default
     end
+	
+	if(player:getMainJob() == tpz.job.DNC and player:getMainLvl() > 65 and player:getCharVar("maatDefeated") ~= 1) then
+		player:PrintToPlayer("To raise your level cap to 75, please collect all your AF and trade me a Dancer's Testimony")
+	end
 end
 
 function onEventUpdate(player, csid, option)

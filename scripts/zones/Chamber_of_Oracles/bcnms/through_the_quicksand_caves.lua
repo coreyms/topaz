@@ -34,5 +34,6 @@ function onEventFinish(player, csid, option)
     if csid == 32001 and player:getCurrentMission(ZILART) == tpz.mission.id.zilart.THROUGH_THE_QUICKSAND_CAVES then
         player:completeMission(ZILART, tpz.mission.id.zilart.THROUGH_THE_QUICKSAND_CAVES)
         player:addMission(ZILART, tpz.mission.id.zilart.THE_CHAMBER_OF_ORACLES)
+		player:setCharVar("ZilartStatus", 2)
     end
 end

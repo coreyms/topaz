@@ -1633,8 +1633,8 @@ void CStatusEffectContainer::TickRegen(time_point tick)
 
                     perpetuation -= charutils::AvatarPerpetuationReduction(PChar);
 
-                    if (perpetuation < 1)
-                        perpetuation = 1;
+                    if (perpetuation < 0)
+                        perpetuation = 0;
                 }
             }
 

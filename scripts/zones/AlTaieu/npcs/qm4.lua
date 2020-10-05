@@ -9,7 +9,6 @@ local ID = require("scripts/zones/AlTaieu/IDs")
 -----------------------------------
 
 function onTrade(player, npc, trade)
-    --[[
     -- JAILER OF LOVE
     if (
         not GetMobByID(ID.mob.JAILER_OF_LOVE):isSpawned() and
@@ -18,11 +17,11 @@ function onTrade(player, npc, trade)
         trade:hasItemQty(1847, 1) and -- fifth_virtue
         trade:hasItemQty(1849, 1) and -- sixth_virtue
         trade:getItemCount() == 3
-    ) then
+    )
+	then
         player:tradeComplete()
         SpawnMob(ID.mob.JAILER_OF_LOVE):updateClaim(player)
     end
-    --]]
 end
 
 function onTrigger(player, npc)

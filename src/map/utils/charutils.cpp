@@ -5100,6 +5100,18 @@ namespace charutils
         return false;
     }
 
+	void AddCharVar(CCharEntity* PChar, const char* var, int32 val)
+	{
+		const char* Query = "UPDATE char_vars SET value = %d WHERE charid = %u AND varname = '%s' LIMIT 1;";
+		Sql_Query(SqlHandle, Query, val, PChar->id, var);
+	}
+	
+	void SetCharVar(CCharEntity* PChar, const char* var, int32 val)
+	{
+		const char* Query = "UPDATE char_vars SET value = %d WHERE charid = %u AND varname = '%s' LIMIT 1;";
+		Sql_Query(SqlHandle, Query, val, PChar->id, var);
+	}
+
     int32 GetCharVar(CCharEntity* PChar, const char* var)
     {
         const char* fmtQuery = "SELECT value FROM char_vars WHERE charid = %u AND varname = '%s' LIMIT 1;";
